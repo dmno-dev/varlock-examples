@@ -1,0 +1,23 @@
+{
+  "name": "varlock-examples",
+  "version": "0.0.0",
+  "description": "Examples of using Varlock with other tools / frameworks",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deps:local": "node scripts/deps.ts local",
+    "deps:published": "node scripts/deps.ts published"
+  },
+  "pnpm": {
+    "overrides": {
+      "@next/env": "npm:@varlock/nextjs-integration",
+      "dotenv": "npm:varlock"
+    }
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@10.21.0",
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "varlock": "^0.1.3"
+  }
+}

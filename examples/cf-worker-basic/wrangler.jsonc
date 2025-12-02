@@ -1,0 +1,7 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "varlock-cf-workers-basic-example",
+  "compatibility_date": "2025-04-03",
+  "main": "./src/index.ts",
+  "compatibility_flags": ["nodejs_compat"]
+}
