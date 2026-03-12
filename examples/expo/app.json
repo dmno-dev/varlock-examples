@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "varlock-expo-example",
+    "slug": "varlock-expo-example",
+    "scheme": "varlock-expo-example",
+    "web": {
+      "bundler": "metro",
+      "output": "server"
+    },
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

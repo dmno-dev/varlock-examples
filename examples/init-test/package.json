@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@clack/prompts": "^0.11.0",
-    "varlock": "^0.1.3"
+    "varlock": "^0.4.0"
   },
   "packageManager": "pnpm@10.14.0"
 }
