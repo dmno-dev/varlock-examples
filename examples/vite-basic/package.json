@@ -9,9 +9,9 @@
     "preview": "APP_ENV=production vite preview"
   },
   "devDependencies": {
-    "@varlock/vite-integration": "^0.1.0",
+    "@varlock/vite-integration": "^0.2.3",
     "typescript": "^5.9.3",
-    "varlock": "^0.1.3",
+    "varlock": "^0.4.0",
     "vite": "^7.0.6"
   },
   "dependencies": {

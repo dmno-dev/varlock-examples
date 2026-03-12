@@ -13,7 +13,13 @@ type WorkspacePackagesInfo = Array<{
 
 // first we gather info about our published varlock packages from our local varlock monorepo
 // which must live in a folder named `varlock` as a sibling to this examples repo
-const varlockPackagesInfo: WorkspacePackagesInfo = JSON.parse(execSync(`cd ../varlock && pnpm m ls --json --depth=-1`).toString());
+// COREPACK_ENABLE_STRICT=0 is needed because the varlock repo declares bun as its packageManager
+const varlockLsOutput = execSync(`cd ../varlock && COREPACK_ENABLE_STRICT=0 pnpm m ls --json --depth=-1 2>/dev/null`, { encoding: 'utf-8' });
+// pnpm outputs multiple JSON arrays (one per workspace package) when the workspace
+// uses the "workspaces" field instead of pnpm-workspace.yaml — merge them into one
+const varlockPackagesInfo: WorkspacePackagesInfo = Array.prototype.concat(
+  ...varlockLsOutput.trim().split(/\n(?=\[)/).map((chunk) => JSON.parse(chunk)),
+);
 const pulishedPackages = varlockPackagesInfo.filter((pkgInfo) => !pkgInfo.private);
 const varlockPackages = pulishedPackages.map((pkgInfo) => ({
   name: pkgInfo.name,
