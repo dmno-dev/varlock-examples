@@ -1,38 +1,52 @@
-# sv
+# SvelteKit + Varlock Example
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+This example demonstrates using [Varlock](https://varlock.dev) with a [SvelteKit](https://svelte.dev/docs/kit/introduction) app. It is set up so the same project can be used for **both a regular (Node/auto adapter) deployment and a Cloudflare Workers deployment** — no need to maintain two separate examples.
 
-## Creating a project
+The adapter is selected at build/dev time via the `SVELTE_ADAPTER` env var (see [svelte.config.js](svelte.config.js)):
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
+- _default_ → `@sveltejs/adapter-auto` (regular deployment)
+- `cloudflare` → `@sveltejs/adapter-cloudflare`
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Install dependencies with `pnpm install`, then start the dev server.
+
+### Regular (adapter-auto)
 
 ```sh
-npm run dev
+pnpm dev
+```
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+### Cloudflare Workers
+
+```sh
+pnpm dev:cf
 ```
 
 ## Building
 
-To create a production version of your app:
+### Regular
 
 ```sh
-npm run build
+pnpm build
+pnpm preview
 ```
 
-You can preview the production build with `npm run preview`.
+### Cloudflare Workers
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```sh
+pnpm build:cf
+pnpm preview:cf
+
+# deploy via wrangler (wrapped by varlock)
+pnpm deploy:cf
+```
+
+
+[*DEPLOYED CLOUDFLARE WORKER*](https://sveltekit-varlock-example.dmno.workers.dev/)
+
+## Further reading
+
+- [SvelteKit adapters](https://svelte.dev/docs/kit/adapters)
+- [Varlock docs](https://varlock.dev)
+
