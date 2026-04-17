@@ -1,0 +1,16 @@
+{
+  "name": "varlock-cloudflare-workers-simple",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "varlock-wrangler dev",
+    "deploy": "APP_ENV=prod varlock-wrangler deploy",
+    "wrangler:types": "varlock-wrangler types"
+  },
+  "devDependencies": {
+    "@varlock/cloudflare-integration": "link:../../../varlock/packages/integrations/cloudflare",
+    "varlock": "link:../../../varlock/packages/varlock",
+    "wrangler": "^4.52.0"
+  }
+}
