@@ -7,6 +7,10 @@ The adapter is selected at build/dev time via the `SVELTE_ADAPTER` env var (see 
 - _default_ → `@sveltejs/adapter-auto` (regular deployment)
 - `cloudflare` → `@sveltejs/adapter-cloudflare`
 
+
+[*DEPLOYED CLOUDFLARE WORKER*](https://sveltekit-varlock-example.dmno.workers.dev/)
+
+
 ## Developing
 
 Install dependencies with `pnpm install`, then start the dev server.
@@ -43,7 +47,6 @@ pnpm deploy:cf
 ```
 
 
-[*DEPLOYED CLOUDFLARE WORKER*](https://sveltekit-varlock-example.dmno.workers.dev/)
 
 ## Further reading
 
