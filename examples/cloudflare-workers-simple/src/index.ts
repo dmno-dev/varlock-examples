@@ -16,7 +16,7 @@ export default {
     console.log('Should be redacted:', ENV.SENSITIVE_ITEM);
 
     return new Response(JSON.stringify({
-      message: `Running in ${navigator.userAgent}!`,
+      message: `Varlock example with Cloudflare workers (simple)`,
 
       'Public item': {
         'ENV.ITEM1 - using varlock (recommended)': ENV.ITEM1,

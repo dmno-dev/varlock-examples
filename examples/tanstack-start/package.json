@@ -25,12 +25,12 @@
     "@tanstack/react-router-ssr-query": "^1.166.10",
     "@tanstack/react-start": "^1.167.3",
     "@tanstack/router-plugin": "^1.167.3",
-    "@varlock/cloudflare-integration": "https://pkg.pr.new/@varlock/cloudflare-integration@622",
-    "@varlock/vite-integration": "0.2.10",
+    "@varlock/cloudflare-integration": "^0.1.0",
+    "@varlock/vite-integration": "^0.2.10",
     "react": "^19.2.5",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.18",
-    "varlock": "https://pkg.pr.new/varlock@622",
+    "varlock": "^0.9.0",
     "wrangler": "^4.76.0"
   },
   "devDependencies": {

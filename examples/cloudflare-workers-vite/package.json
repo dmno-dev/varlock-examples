@@ -12,11 +12,10 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.32.3",
-    "@varlock/cloudflare-integration": "link:../../../varlock/packages/integrations/cloudflare",
-    "varlock": "link:../../../varlock/packages/varlock",
+    "@varlock/cloudflare-integration": "^0.1.0",
+    "varlock": "^0.9.0",
     "vite": "^8.0.8",
     "wrangler": "^4.52.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

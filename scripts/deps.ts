@@ -1,20 +1,23 @@
 import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, writeFileSync } from "node:fs";
 import * as path from "node:path";
+import { listWorkspaces } from "../../varlock/scripts/list-workspaces.ts";
 
-const MODE: 'local' | 'published' = process.argv[2] === 'published' ? 'published' : 'local';
-
-type WorkspacePackagesInfo = Array<{
-  "name": string,
-  "version": string,
-  "path": string,
-  "private": boolean
-}>
+const rawArgs = process.argv.slice(2);
+const force = rawArgs.includes('--force');
+const args = rawArgs.filter((a) => a !== '--force');
+const MODE: 'local' | 'published' = args[0] === 'published' ? 'published' : 'local';
+// optional filter args - only update matching example dirs (matched by folder name substring)
+const filters = args.slice(1);
 
 // first we gather info about our published varlock packages from our local varlock monorepo
 // which must live in a folder named `varlock` as a sibling to this examples repo
-const varlockPackagesInfo: WorkspacePackagesInfo = JSON.parse(execSync(`cd ../varlock && pnpm m ls --json --depth=-1`).toString());
-const pulishedPackages = varlockPackagesInfo.filter((pkgInfo) => !pkgInfo.private);
+const varlockMonorepoRoot = path.resolve(import.meta.dirname, '../../varlock');
+const varlockPackagesInfo = await listWorkspaces(varlockMonorepoRoot);
+const pulishedPackages = varlockPackagesInfo.filter((pkgInfo) => {
+  const pkgJson = JSON.parse(readFileSync(path.join(pkgInfo.path, 'package.json'), 'utf-8'));
+  return !pkgJson.private;
+});
 const varlockPackages = pulishedPackages.map((pkgInfo) => ({
   name: pkgInfo.name,
   publishedVersion: pkgInfo.version,
@@ -28,20 +31,44 @@ const OVERRIDES: Record<string, string> = {
   'dotenv': 'varlock',
 };
 
+// now we find all the example package dirs (examples/* and examples/plugins/*)
+const repoRoot = path.resolve(import.meta.dirname, '..');
+const examplesDir = path.join(repoRoot, 'examples');
+const exampleDirs: Array<string> = [];
+for (const entry of readdirSync(examplesDir, { withFileTypes: true })) {
+  if (!entry.isDirectory() || entry.name === 'node_modules') continue;
+  const dir = path.join(examplesDir, entry.name);
+  if (entry.name.startsWith('plugins')) {
+    // plugins*/* are nested example packages
+    for (const pluginEntry of readdirSync(dir, { withFileTypes: true })) {
+      if (!pluginEntry.isDirectory() || pluginEntry.name === 'node_modules') continue;
+      const pluginDir = path.join(dir, pluginEntry.name);
+      if (existsSync(path.join(pluginDir, 'package.json'))) exampleDirs.push(pluginDir);
+    }
+  } else {
+    if (existsSync(path.join(dir, 'package.json'))) exampleDirs.push(dir);
+  }
+}
+const filteredDirs = filters.length
+  ? exampleDirs.filter((dir) => {
+    const name = path.basename(dir);
+    return filters.some((f) => name.includes(f));
+  })
+  : exampleDirs;
 
+const changedDirs: Array<string> = [];
 
-// now we find all the examples and package.json files that must be updated
-const workspacePackagesInfo: WorkspacePackagesInfo = JSON.parse(execSync(`pnpm m ls --json --depth=-1`).toString());
-for (const workspacePackage of workspacePackagesInfo) {
-  const packageDir = workspacePackage.path;
+for (const packageDir of filteredDirs) {
   const packageJsonPath = path.join(packageDir, "package.json");
-  const packageJsonContents = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-
+  const originalContents = readFileSync(packageJsonPath, "utf-8");
+  const packageJsonContents = JSON.parse(originalContents);
 
   function updateDeps(depsObj: Record<string, string> | undefined) {
     if (!depsObj) return;
     for (const [depName, depVersion] of Object.entries(depsObj)) {
       if (!(depName in varlockPackagesByName)) continue;
+      // skip pkg.pr.new preview URLs unless --force is passed
+      if (!force && depVersion.includes('pkg.pr.new')) continue;
 
       const varlockPkg = varlockPackagesByName[depName];
       if (MODE === 'published') {
@@ -61,7 +88,7 @@ for (const workspacePackage of workspacePackagesInfo) {
 
     const overrideToVarlockPkgName = OVERRIDES[overrideFrom];
     const varlockPkg = varlockPackagesByName[overrideToVarlockPkgName];
-    if (!varlockPkg) throw new Error('Expected to find varlock package for override target: ' + overrideToVarlockPkgName);``
+    if (!varlockPkg) throw new Error('Expected to find varlock package for override target: ' + overrideToVarlockPkgName);
     if (MODE === 'published') {
       packageJsonContents.pnpm.overrides[overrideFrom] = `npm:${overrideToVarlockPkgName}`;
     } else if (MODE === 'local') {
@@ -69,9 +96,16 @@ for (const workspacePackage of workspacePackagesInfo) {
     }
   }
 
-  // write the updated package.json
-  writeFileSync(packageJsonPath, JSON.stringify(packageJsonContents, null, 2) + "\n", "utf-8");
+  const newContents = JSON.stringify(packageJsonContents, null, 2) + "\n";
+  if (newContents !== originalContents) {
+    writeFileSync(packageJsonPath, newContents, "utf-8");
+    changedDirs.push(packageDir);
+  }
 }
 
-// run pnpm install to activate and update lockfile
-execSync('pnpm install', { stdio: 'inherit' });
+// run pnpm install in each changed package to update lockfiles
+for (const dir of changedDirs) {
+  const name = path.relative(repoRoot, dir);
+  console.log(`pnpm install in ${name}...`);
+  execSync('pnpm install', { cwd: dir, stdio: 'inherit' });
+}

@@ -3,5 +3,8 @@
   "name": "worker-simple-varlock-example",
   "compatibility_date": "2025-04-03",
   "main": "./src/index.ts",
-  "compatibility_flags": ["nodejs_compat"]
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
 }
