@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { varlockVitePlugin } from '@varlock/vite-integration';
-import { varlockCloudflareVitePlugin } from '@varlock/cloudflare-integration';
+import { varlockSvelteKitCloudflarePlugin } from '@varlock/cloudflare-integration/sveltekit';
 import { ENV } from 'varlock/env';
 
 const useCloudflare = process.env.SVELTE_ADAPTER === 'cloudflare';
@@ -12,7 +12,7 @@ console.log('VARLOCK_ENV:', ENV.VARLOCK_ENV, '| adapter:', useCloudflare ? 'clou
 export default defineConfig({
 	plugins: [
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(useCloudflare ? varlockCloudflareVitePlugin() : varlockVitePlugin()) as any,
+		(useCloudflare ? varlockSvelteKitCloudflarePlugin() : varlockVitePlugin()) as any,
 		sveltekit(),
 	],
 	test: {
