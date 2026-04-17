@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { ENV } from 'varlock/env'
 import { env } from 'cloudflare:workers'
 
+declare const __USE_CF__: boolean
+
 function redact(val: string | undefined) {
   if (val === undefined || val === null) return { set: false, length: 0 }
   return { set: true, length: val.length }
@@ -20,27 +22,32 @@ export const Route = createFileRoute('/api-route')({
           vars: {
             SENSITIVE_VAR: {
               varlock: redact(ENV.SENSITIVE_VAR),
-              cloudflare: redact(env.SENSITIVE_VAR),
+              processEnv: redact(process.env.SENSITIVE_VAR),
+              ...(__USE_CF__ && { cloudflare: redact(env.SENSITIVE_VAR) }),
               importMeta: redact(import.meta.env.SENSITIVE_VAR),
             },
             ANOTHER_SECRET: {
               varlock: redact(ENV.ANOTHER_SECRET),
-              cloudflare: redact(env.ANOTHER_SECRET),
+              processEnv: redact(process.env.ANOTHER_SECRET),
+              ...(__USE_CF__ && { cloudflare: redact(env.ANOTHER_SECRET) }),
               importMeta: redact(import.meta.env.ANOTHER_SECRET),
             },
             PUBLIC_ITEM: {
               varlock: redact(ENV.PUBLIC_ITEM),
-              cloudflare: redact(env.PUBLIC_ITEM),
+              processEnv: redact(process.env.PUBLIC_ITEM),
+              ...(__USE_CF__ && { cloudflare: redact(env.PUBLIC_ITEM) }),
               importMeta: redact(import.meta.env.PUBLIC_ITEM),
             },
             PUBLIC_OTHER: {
               varlock: redact(ENV.PUBLIC_OTHER),
-              cloudflare: redact(env.PUBLIC_OTHER),
+              processEnv: redact(process.env.PUBLIC_OTHER),
+              ...(__USE_CF__ && { cloudflare: redact(env.PUBLIC_OTHER) }),
               importMeta: redact(import.meta.env.PUBLIC_OTHER),
             },
             VITE_PREFIXED_ITEM: {
               varlock: redact(ENV.VITE_PREFIXED_ITEM),
-              cloudflare: redact(env.VITE_PREFIXED_ITEM),
+              processEnv: redact(process.env.VITE_PREFIXED_ITEM),
+              ...(__USE_CF__ && { cloudflare: redact(env.VITE_PREFIXED_ITEM) }),
               importMeta: redact(import.meta.env.VITE_PREFIXED_ITEM),
             },
           },
@@ -52,13 +59,13 @@ export const Route = createFileRoute('/api-route')({
 })
 
 type RedactedInfo = { set: boolean; length: number }
-type EnvResult = {
-  leaked: string | undefined
-  vars: Record<string, { varlock: RedactedInfo; cloudflare: RedactedInfo; importMeta: RedactedInfo }>
-}
+type VarRow = { varlock: RedactedInfo; processEnv: RedactedInfo; cloudflare?: RedactedInfo; importMeta: RedactedInfo }
 
 function ApiRoutePage() {
-  const [data, setData] = useState<EnvResult | null>(null)
+  const [data, setData] = useState<{
+    leaked: string | undefined
+    vars: Record<string, VarRow>
+  } | null>(null)
   const [loading, setLoading] = useState(false)
 
   const handleFetch = async (leak: boolean) => {
@@ -70,6 +77,9 @@ function ApiRoutePage() {
       setLoading(false)
     }
   }
+
+  const varNames = ['SENSITIVE_VAR', 'ANOTHER_SECRET', 'PUBLIC_ITEM', 'PUBLIC_OTHER', 'VITE_PREFIXED_ITEM'] as const
+  const showCf = data ? 'cloudflare' in data.vars[varNames[0]] : false
 
   return (
     <main className="page-wrap px-4 pb-8 pt-14">
@@ -112,13 +122,14 @@ function ApiRoutePage() {
             <thead>
               <tr className="border-b border-[var(--line)]">
                 <th className="py-2 pr-4">Variable</th>
-                <th className="py-2 pr-4 font-mono text-xs">ENV.xx</th>
-                <th className="py-2 pr-4 font-mono text-xs">env.xx</th>
-                <th className="py-2 font-mono text-xs">import.meta.env.xx</th>
+                <th className="py-2 pr-4 font-mono text-xs"><code>ENV</code> (varlock)</th>
+                <th className="py-2 pr-4 font-mono text-xs"><code>process.env</code></th>
+                {showCf && <th className="py-2 pr-4 font-mono text-xs"><code>env</code> (cloudflare)</th>}
+                <th className="py-2 font-mono text-xs"><code>import.meta.env</code></th>
               </tr>
             </thead>
             <tbody>
-              {(['SENSITIVE_VAR', 'ANOTHER_SECRET', 'PUBLIC_ITEM', 'PUBLIC_OTHER', 'VITE_PREFIXED_ITEM'] as const).map((name) => {
+              {varNames.map((name) => {
                 const row = data.vars[name]
                 if (!row) return null
                 return (
@@ -127,7 +138,8 @@ function ApiRoutePage() {
                       {name}
                     </td>
                     <td className="py-2 pr-4"><RedactedCell info={row.varlock} /></td>
-                    <td className="py-2 pr-4"><RedactedCell info={row.cloudflare} /></td>
+                    <td className="py-2 pr-4"><RedactedCell info={row.processEnv} /></td>
+                    {showCf && <td className="py-2 pr-4"><RedactedCell info={row.cloudflare} /></td>}
                     <td className="py-2"><RedactedCell info={row.importMeta} /></td>
                   </tr>
                 )
@@ -140,7 +152,8 @@ function ApiRoutePage() {
   )
 }
 
-function RedactedCell({ info }: { info: RedactedInfo }) {
+function RedactedCell({ info }: { info: RedactedInfo | undefined }) {
+  if (!info) return <span className="font-mono text-xs text-gray-400">—</span>
   return (
     <span className="font-mono text-xs">
       {info.set ? (

@@ -9,8 +9,11 @@
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "preview": "vite preview",
+    "dev:cf": "USE_CF=1 vite dev --port 3000",
+    "build:cf": "USE_CF=1 vite build",
+    "preview:cf": "USE_CF=1 vite preview",
+    "deploy:cf": "USE_CF=1 varlock-wrangler deploy",
     "test": "vitest run",
-    "deploy": "npm run build && varlock-wrangler deploy",
     "cf-typegen": "varlock-wrangler types"
   },
   "dependencies": {
@@ -22,11 +25,12 @@
     "@tanstack/react-router-ssr-query": "^1.166.10",
     "@tanstack/react-start": "^1.167.3",
     "@tanstack/router-plugin": "^1.167.3",
-    "@varlock/cloudflare-integration": "link:../../../varlock/packages/integrations/cloudflare",
-    "react": "^19.2.0",
+    "@varlock/cloudflare-integration": "https://pkg.pr.new/@varlock/cloudflare-integration@622",
+    "@varlock/vite-integration": "0.2.10",
+    "react": "^19.2.5",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.18",
-    "varlock": "link:../../../varlock/packages/varlock",
+    "varlock": "https://pkg.pr.new/varlock@622",
     "wrangler": "^4.76.0"
   },
   "devDependencies": {

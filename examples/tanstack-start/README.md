@@ -1,3 +1,7 @@
+
+[CLOUDFLARE DEPLOYED EXAMPLE](tanstack-start-varlock-example.dmno.workers.dev)
+
+
 Welcome to your new TanStack Start app! 
 
 # Getting Started
