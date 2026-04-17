@@ -19,7 +19,7 @@
     "test": "npm run test:unit -- --run"
   },
   "dependencies": {
-    "varlock": "0.8.2"
+    "varlock": "https://pkg.pr.new/varlock@622"
   },
   "devDependencies": {
     "@eslint/compat": "^1.4.0",
