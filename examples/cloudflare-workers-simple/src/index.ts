@@ -1,4 +1,4 @@
-// This import is needed at root of worker to enable leak detection / log redaction
+// this is required in your main entry point if building workers without vite
 import '@varlock/cloudflare-integration/init';
 
 // USE THIS!
@@ -16,7 +16,7 @@ export default {
     console.log('Should be redacted:', ENV.SENSITIVE_ITEM);
 
     return new Response(JSON.stringify({
-      message: `Varlock example with Cloudflare workers (simple)`,
+      message: `Varlock example with Cloudflare workers simple (no vite)`,
 
       'Public item': {
         'ENV.ITEM1 - using varlock (recommended)': ENV.ITEM1,

@@ -7,7 +7,7 @@ This may seem strange to use Vite in a backend-only project, but Vite's environm
 From the docs on choosing wrangler vs the vite plugin:
 > Due to Vite's advanced configuration options and large ecosystem of plugins, there is more flexibility to customize your development experience and build output
 
-> For the simpler wrangler-only approach (no Vite), see the `cloudflare-workers-simple` example instead.
+> For the simpler wrangler-only approach (no Vite), see the [`cloudflare-workers-simple`](../cloudflare-workers-simple) example instead.
 
 ## Setup
 
@@ -25,16 +25,14 @@ From the docs on choosing wrangler vs the vite plugin:
 
 ## How it works
 
-The `vite.config.ts` uses `varlockCloudflareVitePlugin()` from `@varlock/cloudflare-integration` alongside Cloudflare's own `cloudflare()` Vite plugin. Config is resolved and injected at build time.
+The `vite.config.ts` uses `varlockCloudflareVitePlugin()` from `@varlock/cloudflare-integration`. This plugin wraps Cloudflare's Vite plugin internally, so you don't need to add it separately. Config is resolved and injected at build time.
 
 ```typescript
 import { varlockCloudflareVitePlugin } from "@varlock/cloudflare-integration";
-import { cloudflare } from "@cloudflare/vite-plugin";
 
 export default defineConfig({
   plugins: [
     varlockCloudflareVitePlugin(),
-    cloudflare(),
   ],
 });
 ```

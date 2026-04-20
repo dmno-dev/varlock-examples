@@ -10,7 +10,7 @@ import { ENV } from 'varlock/env';
 console.log(ENV.SOME_VAR); // works, even outside of a request
 ```
 
-> If you want to use the Vite-based Cloudflare Workers setup, see the `cloudflare-workers-vite` example instead.
+> If you want to use the Vite-based Cloudflare Workers setup, see the [`cloudflare-workers-vite`](../cloudflare-workers-vite) example instead.
 
 ## Setup
 
