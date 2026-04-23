@@ -1,0 +1,32 @@
+{
+  "name": "nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:webpack": "next dev --webpack",
+    "dev": "next dev",
+    "build:webpack": "next build --webpack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@varlock/nextjs-integration": "0.3.6",
+    "next": "^16.2.4",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "varlock": "^0.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.3",
+    "vercel": "^52.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@next/env": "npm:@varlock/nextjs-integration"
+    }
+  }
+}
